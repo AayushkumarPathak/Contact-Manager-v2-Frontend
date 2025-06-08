@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -8,6 +8,7 @@ import {
   Heart, 
   Settings 
 } from 'lucide-react';
+import { getCurrUserDetails } from '@/auth';
 
 const sidebarItems = [
   { id: 'contacts', label: 'My Contacts', icon: Users },
@@ -24,6 +25,13 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, activeItem, onItemClick }) => {
+
+  const [user,setUser] = useState(null);
+
+  useEffect(()=>{
+    setUser(getCurrUserDetails());
+  },[])
+
   return (
     <aside className={`bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 transition-all duration-300 flex flex-col ${
       isCollapsed ? 'w-16' : 'w-64'
@@ -31,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, activeItem, on
       {/* Sidebar Header */}
       <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
         {!isCollapsed && (
-          <span className="font-medium text-slate-900 dark:text-white">Navigation</span>
+          <span className="font-medium text-slate-900 dark:text-white"></span>
         )}
         <button
           onClick={onToggle}
@@ -83,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, activeItem, on
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                John Doe
+              John Doe
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                 john@example.com

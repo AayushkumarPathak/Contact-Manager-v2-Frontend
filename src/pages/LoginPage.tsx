@@ -4,11 +4,14 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import Navbar from '../mycomponents/PublicNavbar';
 import {Spinner} from '@/mycomponents/Spinner';
 import { useLoading } from '@/contexts/GlobalLoadingContext';
+import { loginUser } from '@/apiService/user-service';
+import { doLogin } from '@/auth';
+import { toast } from 'react-toastify';
 
 const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
 
@@ -30,13 +33,50 @@ const LoginPage: React.FC = () => {
    
     // Handle login logic here
     setLoading(true);
-    console.log('Login data:', formData);
-    
-    setTimeout(()=>{
-      setLoading(false);
-      navigate("/dashboard");
-    },4000);
+    // console.log('Login data:', formData);
 
+    if (formData.username.trim() === "" || formData.password.trim() === "") {
+        toast.error("Please fill all the fields",{
+          className:"custom-toast"
+        });
+        setLoading(false);
+        return;
+    }
+    
+    if (formData.username.includes("@") == false) {
+        toast.error("Please provide valid email",{
+          className:"custom-toast"
+        });
+        setLoading(false);
+        return;
+    }
+
+
+    try {
+      loginUser(formData)
+      .then((jwtToken)=>{
+        doLogin(jwtToken,()=>{
+          console.log("User jwt token: ",jwtToken);
+        });
+        toast.success("Login Success");
+        
+        setTimeout(()=>{
+          setLoading(false);
+          navigate("/user/dashboard");
+        },3000)
+      })
+      .catch((err)=>{
+        const errData = err?.response?.data;
+        console.log("Error invalid credentials of user: ",errData);
+        toast.error(errData?.message || "Internal Server Error",{
+          className:"custom-toast"
+        });
+        setLoading(false);
+      })
+    } catch (error) {
+      alert("Something went wrong")
+      console.log("Error in login service:",error);
+    }
   };
   
   
@@ -64,7 +104,7 @@ const LoginPage: React.FC = () => {
           </div>
 
           <div className="bg-slate-50 dark:bg-slate-800 p-8 rounded-xl border border-slate-200 dark:border-slate-700">
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-6" onSubmit={handleSubmit} noValidate>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Email address
@@ -74,11 +114,11 @@ const LoginPage: React.FC = () => {
                     <Mail className="h-5 w-5 text-slate-400" />
                   </div>
                   <input
-                    id="email"
-                    name="email"
+                    id="username"
+                    name="username"
                     type="email"
                     required
-                    value={formData.email}
+                    value={formData.username}
                     onChange={handleInputChange}
                     className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent"
                     placeholder="Enter your email"

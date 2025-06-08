@@ -1,29 +1,60 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Mail, Lock, User, Phone, LocationEdit, User2 } from 'lucide-react';
 import Navbar from '../mycomponents/PublicNavbar';
+import { signupUser } from '@/apiService/user-service';
+import { toast } from 'react-toastify';
 
 const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
+    fullName: '',
+    username:'',
     email: '',
     password: '',
-    confirmPassword: ''
+    phoneNumber: '',
+    address:'',
+    about:''
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle registration logic here
     console.log('Registration data:', formData);
+
+     if (
+        formData.email.trim() === "" ||
+        formData.password.trim() === "" ||
+        formData.fullName.trim() === "" ||
+        formData.about.trim() === ""||
+        formData.address.trim() === ""||
+        formData.username.trim() === ""
+      ) {
+        toast.error("Please fill all the fields");
+        return;
+      }
+      // backend api call here.
+      signupUser(formData)
+      .then((res)=>{
+        console.log("Response:", res);
+        console.log("Sign up Success");
+        toast.success("Sign up Success");
+        navigate("/login");
+       
+      })
+      .catch((err)=>{
+        console.log("Error signup: ",err);
+        toast.error("error registering user");
+      })
+    
   };
 
   return (
@@ -58,13 +89,34 @@ const Signup: React.FC = () => {
                   </div>
                   <input
                     id="name"
-                    name="name"
+                    name="fullName"
                     type="text"
                     required
-                    value={formData.name}
+                    value={formData.fullName}
                     onChange={handleInputChange}
                     className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent"
                     placeholder="Enter your full name"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Username
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User2 className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    required
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent"
+                    placeholder="Enter your username"
                   />
                 </div>
               </div>
@@ -122,35 +174,67 @@ const Signup: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Confirm Password
+             <div>
+                <label htmlFor="phoneNumber" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Phone Number
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-slate-400" />
+                    <Phone className="h-5 w-5 text-slate-400" />
                   </div>
                   <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    type="text"
                     required
-                    value={formData.confirmPassword}
+                    value={formData.phoneNumber}
                     onChange={handleInputChange}
-                    className="block w-full pl-10 pr-10 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent"
-                    placeholder="Confirm your password"
+                    className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent"
+                    placeholder="Your contact number"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" />
-                    )}
-                  </button>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Address
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <LocationEdit className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <input
+                    id="address"
+                    name="address"
+                    type="text"
+                    required
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent"
+                    placeholder="Enter your Address"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="about" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  About
+                </label>
+                <div className="relative">
+                  {/* <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                   
+                  </div> */}
+                  <textarea
+                    id="about"
+                    name="about"
+                    required
+                    rows={3}
+                    cols={4}
+
+                    value={formData.about}
+                    onChange={handleInputChange}
+                    className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent"
+                    placeholder="Tell us something about you"
+                  />
                 </div>
               </div>
 

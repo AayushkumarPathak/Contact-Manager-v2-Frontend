@@ -1,0 +1,12 @@
+.custom-toast {
+  width: 300px;
+  height: auto; /* Set a fixed value like 80px if needed */
+  padding: 1rem;
+  font-size: 1rem;
+  background-color: #1e293b; /* dark slate */
+  color: #f8fafc;             /* light text */
+  border-left: 5px solid #0ea5e9; /* sky-500 */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  margin-top: 2.7rem;
+}

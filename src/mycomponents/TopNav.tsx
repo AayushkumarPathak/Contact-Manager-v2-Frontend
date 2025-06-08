@@ -13,11 +13,13 @@ const TopNav: React.FC<TopNavProps> = ({ onLogout }) => {
     <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
       <div className='mx-10'>
         <h1 className="text-2xl sm:mx-28 lg:mx-0 font-semibold text-slate-900 dark:text-white">
-        Contact Manager v2
+        Contact Manager
       </h1>
+      
       </div>
       
       <div className="flex items-center gap-3">
+      
        <ThemeToogle/>
         
         <button

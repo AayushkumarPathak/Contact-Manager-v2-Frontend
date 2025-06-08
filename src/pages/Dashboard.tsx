@@ -7,6 +7,7 @@ import MobileSidebar from "@/mycomponents/MobileSidebar";
 import TopNav from "@/mycomponents/TopNav";
 import MainContent from "@/mycomponents/MainContent";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 // Main Dashboard Component
 const Dashboard = () => {
@@ -19,6 +20,8 @@ const Dashboard = () => {
   const handleLogout = () => {
     console.log('Logging out...');
     // Implement logout logic
+    localStorage.removeItem("loginToken");
+    toast.success("Logging out");
     setTimeout(()=>{
       navigate("/login")
     },1000);
