@@ -1,13 +1,34 @@
+import { getContactByUser } from "@/apiService/contact-service";
+import { useUserContext } from "@/contexts/user-context";
 import type { Contact } from "@/types";
 import { useEffect, useState } from "react";
 
 function MyContacts() {
   const [contacts, setContacts] = useState<Contact[]>([]);
-  useEffect(() => {
-    
-    
+  // const [currUser, setCurrUser] = useState<User | null>(null);
 
-  }, []);
+  const {user} = useUserContext();
+  const [loading , setLoading] = useState(false);
+
+  useEffect(() => {
+
+    const fetchContacts = async () => {
+      if (user) {
+        const fetchedContacts = await getContactByUser(user?.id);
+        
+        setContacts(fetchedContacts);
+        console.log("Fetched contacts:", fetchedContacts); // Log fetched contacts
+        
+      }
+      else{
+          setLoading(true)
+      }
+      
+    };
+    
+    fetchContacts();
+    setLoading(false);
+  }, [user]);
 
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -59,47 +80,62 @@ function MyContacts() {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th className="p-4">
-              <input
-                type="checkbox"
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm"
-              />
+            Avatar
             </th>
+            
             <th className="px-6 py-3">Name</th>
             <th className="px-6 py-3">Phone</th>
+            <th className="px-6 py-3">Email</th>
+            <th className="px-6 py-3">Address</th>
             <th className="px-6 py-3">Favorite</th>
             <th className="px-6 py-3">Action</th>
           </tr>
         </thead>
         <tbody>
-          {contacts.map((contact) => (
-            <tr
-              key={contact.id}
-              className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-            >
-              <td className="p-4">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm"
-                />
-              </td>
-              <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                {contact.name}
-              </td>
-              <td className="px-6 py-4">{contact.phone}</td>
-              <td className="px-6 py-4">
-                {contact.favorite ? (
-                  <span className="text-green-600 font-medium">Yes</span>
-                ) : (
-                  <span className="text-gray-500">No</span>
-                )}
-              </td>
-              <td className="px-6 py-4">
-                <button className="text-blue-600 dark:text-blue-500 hover:underline">
-                  Edit
-                </button>
+          {contacts?.length > 0 ? (
+            contacts.map((contact) => (
+              <tr
+                key={contact.id}
+                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+              >
+                <td className="p-4">
+                  <div className="h-12 w-12 bg-gray-700 rounded-full">
+                  <img 
+                    src={contact.picture}
+                    alt={contact.fullName+"scm.jpg"}
+                    className="h-full w-full rounded-full"
+                  />
+                  </div>
+                  
+                </td>
+                <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                  {contact.fullName}
+                </td>
+                <td className="px-6 py-4">{contact.phoneNumber}</td>
+                <td className="px-6 py-4">{contact.email}</td>
+                <td className="px-6 py-4">{contact.address}</td>
+                <td className="px-6 py-4">
+                  {contact.favorite ? (
+                    <span className="text-green-600 font-medium">Yes</span>
+                  ) : (
+                    <span className="text-gray-500">No</span>
+                  )}
+                </td>
+                <td className="px-6 py-4">
+                  <button className="text-blue-600 dark:text-blue-500 hover:underline">
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            
+            <tr>
+              <td colSpan={7} className="text-center py-4">
+                {loading ? "Loading... " : "No contact available"}
               </td>
             </tr>
-          ))}
+          ) }
         </tbody>
       </table>
     </div>

@@ -1,6 +1,4 @@
-import { useState } from "react";
-
-
+import { useState, useEffect } from "react";
 import { Menu} from 'lucide-react';
 import Sidebar from "@/mycomponents/Sidebar";
 import MobileSidebar from "@/mycomponents/MobileSidebar";
@@ -8,6 +6,7 @@ import TopNav from "@/mycomponents/TopNav";
 import MainContent from "@/mycomponents/MainContent";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { initializeUserContext } from "@/contexts/user-context";
 
 // Main Dashboard Component
 const Dashboard = () => {
@@ -16,6 +15,13 @@ const Dashboard = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState('contacts');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = initializeUserContext();
+    if (user) {
+      console.log("User initialized in context:", user);
+    }
+  }, []);
 
   const handleLogout = () => {
     console.log('Logging out...');

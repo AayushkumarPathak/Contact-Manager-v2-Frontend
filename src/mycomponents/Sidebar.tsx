@@ -8,7 +8,8 @@ import {
   Heart, 
   Settings 
 } from 'lucide-react';
-import { getCurrUserDetails } from '@/auth';
+import { useUserContext } from '@/contexts/user-context';
+import { makeTitleCase } from '@/util/helpers';
 
 const sidebarItems = [
   { id: 'contacts', label: 'My Contacts', icon: Users },
@@ -26,11 +27,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, activeItem, onItemClick }) => {
 
-  const [user,setUser] = useState(null);
-
-  useEffect(()=>{
-    setUser(getCurrUserDetails());
-  },[])
+ const {user} = useUserContext();
 
   return (
     <aside className={`bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 transition-all duration-300 flex flex-col ${
@@ -91,10 +88,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, activeItem, on
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-              John Doe
+              {makeTitleCase(user?.fullName ? user.fullName : "Loading...")}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                john@example.com
+                {user?.email ? user?.email : "Loading..."}
               </p>
             </div>
           )}
