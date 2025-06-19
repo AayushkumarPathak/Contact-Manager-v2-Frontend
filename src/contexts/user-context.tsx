@@ -10,11 +10,15 @@ import type { User } from "@/types/index";
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
+  loading: boolean;
+  initialize: () => Promise<void>;
 }
 
 const defaultContext: UserContextType = {
   user: null,
   setUser: () => {},
+  loading: true,
+  initialize: async () => {},
 };
 
 export const UserContext = createContext<UserContextType>(defaultContext);
@@ -35,22 +39,33 @@ const getCurrUserDetails = (): User | null => {
   return null;
 };
 
-export const initializeUserContext = () => {
-  const savedUser = getCurrUserDetails();
-  return savedUser;
-};
-
 export const UserContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const initialize = async () => {
+    setLoading(true);
+    try {
+      const savedUser = getCurrUserDetails();
+      if (savedUser) {
+        setUser(savedUser);
+      }
+    } catch (error) {
+      console.error('Error initializing user context:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const savedUser = getCurrUserDetails();
-    setUser(savedUser);
+    initialize();
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, loading, initialize }}>
       {children}
     </UserContext.Provider>
   );
 };
+
+

@@ -7,6 +7,7 @@ import { useLoading } from '@/contexts/GlobalLoadingContext';
 import { loginUser } from '@/apiService/user-service';
 import { doLogin } from '@/auth';
 import { toast } from 'react-toastify';
+import { useUserContext } from '@/contexts/user-context';
 
 const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,10 +16,8 @@ const LoginPage: React.FC = () => {
     password: ''
   });
 
-  //Loading logic
-  const{isLoading, setLoading } = useLoading();
-
-
+  const { isLoading, setLoading } = useLoading();
+  const { initialize } = useUserContext();
   const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,54 +27,43 @@ const LoginPage: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-   
-    // Handle login logic here
     setLoading(true);
-    // console.log('Login data:', formData);
 
     if (formData.username.trim() === "" || formData.password.trim() === "") {
-        toast.error("Please fill all the fields",{
-          className:"custom-toast"
-        });
-        setLoading(false);
-        return;
-    }
-    
-    if (formData.username.includes("@") == false) {
-        toast.error("Please provide valid email",{
-          className:"custom-toast"
-        });
-        setLoading(false);
-        return;
+      toast.error("Please fill all the fields", {
+        className: "custom-toast"
+      });
+      setLoading(false);
+      return;
     }
 
+    if (!formData.username.includes("@")) {
+      toast.error("Please provide valid email", {
+        className: "custom-toast"
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
-      loginUser(formData)
-      .then((jwtToken)=>{
-        doLogin(jwtToken,()=>{
-          console.log("User jwt token: ",jwtToken);
-        });
+      const jwtToken = await loginUser(formData);
+      await doLogin(jwtToken, async () => {
+        console.log("User jwt token: ", jwtToken);
+        // Initialize user context with new data
+        await initialize();
         toast.success("Login Success");
-        
-        setTimeout(()=>{
-          setLoading(false);
-          navigate("/user/dashboard");
-        },3000)
-      })
-      .catch((err)=>{
-        const errData = err?.response?.data;
-        console.log("Error invalid credentials of user: ",errData);
-        toast.error(errData?.message || "Internal Server Error",{
-          className:"custom-toast"
-        });
-        setLoading(false);
-      })
-    } catch (error) {
-      alert("Something went wrong")
-      console.log("Error in login service:",error);
+        navigate("/user/contacts", { replace: true });
+      });
+    } catch (err: any) {
+      const errData = err?.response?.data;
+      console.log("Error invalid credentials of user: ", errData);
+      toast.error(errData?.message || "Internal Server Error", {
+        className: "custom-toast"
+      });
+    } finally {
+      setLoading(false);
     }
   };
   

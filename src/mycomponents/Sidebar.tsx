@@ -10,24 +10,23 @@ import {
 } from 'lucide-react';
 import { useUserContext } from '@/contexts/user-context';
 import { makeTitleCase } from '@/util/helpers';
+import { Link, useLocation } from 'react-router-dom';
 
 const sidebarItems = [
-  { id: 'contacts', label: 'My Contacts', icon: Users },
-  { id: 'add', label: 'Add Contact', icon: UserPlus },
-  { id: 'favorites', label: 'Favorites', icon: Heart },
-  { id: 'settings', label: 'Settings', icon: Settings },
+  { id: 'contacts', label: 'My Contacts', icon: Users, path: '/user/contacts' },
+  { id: 'add', label: 'Add Contact', icon: UserPlus, path: '/user/add' },
+  { id: 'favorites', label: 'Favorites', icon: Heart, path: '/user/favorites' },
+  { id: 'settings', label: 'Settings', icon: Settings, path: '/user/settings' },
 ];
 
 interface SidebarProps {
   isCollapsed: boolean;
   onToggle: () => void;
-  activeItem: string;
-  onItemClick: (id: string) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, activeItem, onItemClick }) => {
-
- const {user} = useUserContext();
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
+  const { user, loading: userLoading } = useUserContext();
+  const location = useLocation();
 
   return (
     <aside className={`bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 transition-all duration-300 flex flex-col ${
@@ -55,12 +54,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, activeItem, on
         <ul className="space-y-1">
           {sidebarItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeItem === item.id;
-            
+            const isActive = location.pathname === item.path;
+
             return (
               <li key={item.id}>
-                <button
-                  onClick={() => onItemClick(item.id)}
+                <Link
+                  to={item.path}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                     isActive
                       ? 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white'
@@ -72,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, activeItem, on
                   {!isCollapsed && (
                     <span className="text-sm font-medium">{item.label}</span>
                   )}
-                </button>
+                </Link>
               </li>
             );
           })}
@@ -87,12 +86,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, activeItem, on
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-              {makeTitleCase(user?.fullName ? user.fullName : "Loading...")}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                {user?.email ? user?.email : "Loading..."}
-              </p>
+              {userLoading ? (
+                <div className="space-y-2">
+                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse w-24"></div>
+                  <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded animate-pulse w-32"></div>
+                </div>
+              ) : (
+                <>
+                  <Link to="/user/profile" className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                    {makeTitleCase(user?.fullName ? user.fullName : "") || 'No User'}
+                  </Link>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                    {user?.email || 'No Email'}
+                  </p>
+                </>
+              )}
             </div>
           )}
         </div>

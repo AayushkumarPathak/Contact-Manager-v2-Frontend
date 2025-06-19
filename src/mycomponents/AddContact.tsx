@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import type { ContactFormData } from "@/types/index";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { saveContactForUser } from "@/apiService/contact-service";
 import { toast } from "react-toastify";
 import { useUserContext } from "@/contexts/user-context";
 
 function AddContact() {
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState<ContactFormData>({
     fullName: "",
     email: "",
@@ -46,25 +48,45 @@ function AddContact() {
     }));
   };
 
+  const clearForm = () => {
+    setFormData({
+      fullName: "",
+      email: "",
+      phoneNumber: "",
+      address: "",
+      description: "",
+      favorite: false,
+      websiteLink: "",
+      linkedInLink: "",
+      links: [{ link: "", title: "" }],
+    });
+    setImageFile(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const isValid = validateFormData(formData);
     if (!isValid) return;
 
+    setLoading(true);
     try {
       if (user) {
-        const response = await saveContactForUser(
-          user?.id,
-          formData,
-          imageFile
-        );
-        toast.success("Contact Saved");
-        console.log("Contact created:", response.data);
+        await saveContactForUser(user?.id, formData, imageFile);
+        toast.success("Contact Saved Successfully");
+        clearForm();
       }
     } catch (error: any) {
-      toast.error("Please try again");
-      console.error("Error saving contact:", error?.response?.data || error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to save contact. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
   };
 
   function validateFormData(formData: ContactFormData): boolean {
@@ -241,7 +263,7 @@ function AddContact() {
           {/* Flowbite Dropzone */}
           <label
             htmlFor="dropzone-file"
-            className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+            className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600 dark:hover:border-gray-500"
           >
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
               <svg
@@ -281,7 +303,15 @@ function AddContact() {
 
           {/* Preview */}
           {imageFile && (
-            <div className="mt-2">
+            <div className="relative mt-2 inline-block">
+              <button
+                type="button"
+                onClick={removeImage}
+                className="absolute -top-2 -right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full"
+                title="Remove image"
+              >
+                <X size={16} />
+              </button>
               <p className="text-sm text-slate-700 dark:text-slate-300 mb-1">
                 Preview:
               </p>
@@ -297,9 +327,10 @@ function AddContact() {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all"
+          disabled={loading}
+          className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save Contact
+          {loading ? "Saving..." : "Save Contact"}
         </button>
       </form>
     </div>

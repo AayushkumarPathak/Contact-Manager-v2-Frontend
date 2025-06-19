@@ -2,33 +2,39 @@ import { getContactByUser } from "@/apiService/contact-service";
 import { useUserContext } from "@/contexts/user-context";
 import type { Contact } from "@/types";
 import { useEffect, useState } from "react";
+import { Eye, Loader2, Pen, Trash, Trash2, TrashIcon } from "lucide-react";
 
 function MyContacts() {
   const [contacts, setContacts] = useState<Contact[]>([]);
-  // const [currUser, setCurrUser] = useState<User | null>(null);
-
-  const {user} = useUserContext();
-  const [loading , setLoading] = useState(false);
+  const { user, loading: userLoading } = useUserContext();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-
     const fetchContacts = async () => {
-      if (user) {
-        const fetchedContacts = await getContactByUser(user?.id);
-        
-        setContacts(fetchedContacts);
-        console.log("Fetched contacts:", fetchedContacts); // Log fetched contacts
-        
-      }
-      else{
-          setLoading(true)
-      }
+      if (!user || userLoading) return;
       
+      setLoading(true);
+      try {
+        const fetchedContacts = await getContactByUser(user.id);
+        setContacts(fetchedContacts);
+        console.log("Fetched contacts:", fetchedContacts);
+      } catch (error) {
+        console.error("Failed to fetch contacts:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-    
+
     fetchContacts();
-    setLoading(false);
-  }, [user]);
+  }, [user, userLoading]);
+
+  if (userLoading || loading) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -79,10 +85,7 @@ function MyContacts() {
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
-            <th className="p-4">
-            Avatar
-            </th>
-            
+            <th className="p-4">Avatar</th>
             <th className="px-6 py-3">Name</th>
             <th className="px-6 py-3">Phone</th>
             <th className="px-6 py-3">Email</th>
@@ -100,13 +103,12 @@ function MyContacts() {
               >
                 <td className="p-4">
                   <div className="h-12 w-12 bg-gray-700 rounded-full">
-                  <img 
-                    src={contact.picture}
-                    alt={contact.fullName+"scm.jpg"}
-                    className="h-full w-full rounded-full"
-                  />
+                    <img 
+                      src={contact.picture}
+                      alt={contact.fullName+"scm.jpg"}
+                      className="h-full w-full rounded-full"
+                    />
                   </div>
-                  
                 </td>
                 <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                   {contact.fullName}
@@ -121,21 +123,33 @@ function MyContacts() {
                     <span className="text-gray-500">No</span>
                   )}
                 </td>
-                <td className="px-6 py-4">
-                  <button className="text-blue-600 dark:text-blue-500 hover:underline">
-                    Edit
+                <td className="px-6 py-4 ">
+                  <button className="p-1">
+                    <Eye/>
+                  </button >
+                  <button className="p-2 m-2">
+                    <Pen/>
+                  </button>
+                  <button className="p-1">
+                    <TrashIcon/>
                   </button>
                 </td>
               </tr>
             ))
           ) : (
-            
             <tr>
               <td colSpan={7} className="text-center py-4">
-                {loading ? "Loading... " : "No contact available"}
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Loading contacts...</span>
+                  </div>
+                ) : (
+                  "No contacts available"
+                )}
               </td>
             </tr>
-          ) }
+          )}
         </tbody>
       </table>
     </div>
