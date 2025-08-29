@@ -24,7 +24,6 @@ export type Contact = {
   favorite: boolean;
   websiteLink: string;
   linkedInLink: string;
-  cloudinaryPublicId: string;
   createdAt: string;
   links: {
     id: number;
@@ -32,6 +31,16 @@ export type Contact = {
     link: string;
   }[];
 };
+
+export type PaginatedContactResponse = {
+  contacts: Contact[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  lastPage: boolean;
+};
+
 
 
 // types/User.ts

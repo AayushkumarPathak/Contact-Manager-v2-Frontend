@@ -1,17 +1,21 @@
 import { privateAxios } from "./Api-Constants";
-import type { Contact, ContactFormData } from "@/types/index"; // if you store Contact type elsewhere
+import type { Contact, ContactFormData,PaginatedContactResponse } 
+from "@/types/index";
 
-export const getContactByUser = async (uid: number): Promise<Contact[]> => {
+export const getContactByUser = async (
+  uid: number,
+  pageNumber : number,
+  pageSize : number
+): Promise<PaginatedContactResponse | null> => {
   try {
-    const response = await privateAxios.get(`/contact/user/${uid}`);
-    return response.data.data.contacts; // ✅ FIX: Access nested contacts array
+    const response = await privateAxios.get(`/contact/user/${uid}?pageNumber=${pageNumber}&pageSize=${pageSize}&sortBy=createdAt&sortDir=${"desc"}`);
+
+    return response.data.data as PaginatedContactResponse;
   } catch (error) {
     console.error("Failed to fetch contacts:", error);
-    return []; 
+    return null;
   }
 };
-
-
 
 export const saveContactForUser = async (
   userId: number,
@@ -31,4 +35,16 @@ export const saveContactForUser = async (
   return response;
 };
 
+
+export const deleteContactById = async (contactId:number) => {
+  const response = await privateAxios.delete(`/contact/${contactId}`);
+
+  return response.data;
+
+}
+
+export const getContactById = async (contactId: number) => {
+    const response = await privateAxios.get(`/contact/${contactId}`);
+    return response.data;
+  };
 

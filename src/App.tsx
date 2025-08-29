@@ -12,6 +12,8 @@ import AddContact from "@/pages/AddContact";
 import FavoriteContacts from "@/pages/FavoriteContacts";
 import AppSettings from "@/pages/AppSettings";
 import UserProfile from "./pages/UserProfile";
+import ViewContact from "./pages/ViewContact";
+import PricingPage from "./pages/PricingPage";
 
 function App() {
   return (
@@ -36,6 +38,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/pricing" element={<PricingPage/>}/>
 
               {/* Protected Routes */}
               <Route path="/user" element={<AuthLayout />}>
@@ -45,6 +48,7 @@ function App() {
                 <Route path="favorites" element={<FavoriteContacts />} />
                 <Route path="settings" element={<AppSettings />} />
                 <Route path="profile" element={<UserProfile />} />
+                <Route path="contact/:contactId" element={<ViewContact/>} />
               </Route>
 
               {/* Redirect /dashboard to /user/contacts */}

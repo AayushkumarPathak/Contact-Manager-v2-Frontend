@@ -11,12 +11,15 @@ import {
   X,
   Save,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import { useUserContext } from "@/contexts/user-context";
 import type { User as UserType } from "@/types/index";
 import { toast } from "react-toastify";
 import { updateUser } from "@/apiService/user-service";
 import { makeTitleCase } from "@/util/helpers";
+import { useNavigate } from "react-router-dom";
+import BackButton from "@/mycomponents/BackButton";
 
 interface UserData {
   fullName: string;
@@ -37,6 +40,7 @@ const UserProfileCard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Convert User type to UserData format
   const convertUserToUserData = (user: UserType): UserData => {
@@ -182,6 +186,7 @@ const UserProfileCard = () => {
       {/* Main Content Container */}
       <div className="max-w-4xl mx-auto">
         {/* Profile Card */}
+         <BackButton/>
         <div className="bg-white rounded-xl border border--700 shadow-md shadow-gray-400 dark:shadow-md dark:shadow-gray-700 overflow-hidden ">
           {/* Header */}
           <div className="bg-slate-800 px-6 py-8 text-white">

@@ -2,12 +2,21 @@ import { getContactByUser } from "@/apiService/contact-service";
 import { useUserContext } from "@/contexts/user-context";
 import type { Contact } from "@/types";
 import { useEffect, useState } from "react";
-import { Eye, Loader2, Pen, Trash, Trash2, TrashIcon } from "lucide-react";
+import { Eye, Loader2, Pen, TrashIcon, UserRoundSearch } from "lucide-react";
+import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from "@/util/app-constants";
+import { Link } from "react-router-dom";
 
 function MyContacts() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const { user, loading: userLoading } = useUserContext();
   const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+  pageNumber: 0,
+  pageSize: 4,
+  totalElements: 0,
+  totalPages: 0,
+  lastPage: true,
+});
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -15,8 +24,17 @@ function MyContacts() {
       
       setLoading(true);
       try {
-        const fetchedContacts = await getContactByUser(user.id);
-        setContacts(fetchedContacts);
+        const fetchedContacts = await getContactByUser(user.id,0,5);
+        if(fetchedContacts){
+          setContacts(fetchedContacts.contacts);
+          setPagination({
+            pageNumber: fetchedContacts.pageNumber,
+            pageSize: fetchedContacts.pageSize,
+            totalElements: fetchedContacts.totalElements,
+            totalPages: fetchedContacts.totalPages,
+            lastPage: fetchedContacts.lastPage,
+          });
+        }
         console.log("Fetched contacts:", fetchedContacts);
       } catch (error) {
         console.error("Failed to fetch contacts:", error);
@@ -27,6 +45,23 @@ function MyContacts() {
 
     fetchContacts();
   }, [user, userLoading]);
+
+  const changePage = async (pageNumber=DEFAULT_PAGE_NUMBER,pageSize=DEFAULT_PAGE_SIZE) => {
+    if(user){
+      const response = await getContactByUser(user.id,pageNumber,pageSize);
+      if(response){
+          setContacts(response.contacts);
+          setPagination({
+            pageNumber: response.pageNumber,
+            pageSize: response.pageSize,
+            totalElements: response.totalElements,
+            totalPages: response.totalPages,
+            lastPage: response.lastPage,
+          });
+        }
+    }
+
+  }
 
   if (userLoading || loading) {
     return (
@@ -124,15 +159,12 @@ function MyContacts() {
                   )}
                 </td>
                 <td className="px-6 py-4 ">
-                  <button className="p-1">
-                    <Eye/>
-                  </button >
-                  <button className="p-2 m-2">
-                    <Pen/>
-                  </button>
-                  <button className="p-1">
-                    <TrashIcon/>
-                  </button>
+                  <Link
+                    to={"/user/contact/"+contact.id}
+                    className="p-1">
+                      <UserRoundSearch/>
+                  </Link >
+                 
                 </td>
               </tr>
             ))
@@ -152,6 +184,77 @@ function MyContacts() {
           )}
         </tbody>
       </table>
+
+          {/* Pagination  */}
+       <div className="mb-10">
+          <nav aria-label="Page navigation example">
+            <ul className="flex items-center mt-10 justify-center -space-x-px h-8 text-sm">
+              <li>
+                <button
+                  disabled={pagination.pageNumber === 0}
+                  onClick={() => changePage(--pagination.pageNumber)}
+                  className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  <span className="sr-only">Previous</span>
+                  <svg
+                    className="w-2.5 h-2.5 rtl:rotate-180"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 6 10"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 1 1 5l4 4"
+                    />
+                  </svg>
+                </button>
+              </li>
+              {/* Page Numbers */}
+              {[...Array(pagination.totalPages)].map((_, index) => (
+                <li key={index} id="page-btn">
+                  <button
+                    onClick={() => changePage(index)}
+                    
+                    className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                  >
+                    {index + 1}
+                  </button>
+                </li>
+              ))}
+
+              {/* next */}
+              <li>
+                <button
+                  disabled={pagination.pageNumber == pagination.totalPages - 1}
+                  onClick={() => changePage(++pagination.pageNumber)}
+                  className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  <span className="sr-only">Next</span>
+
+                  <svg
+                    className="w-2.5 h-2.5 rtl:rotate-180"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 6 10"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m1 9 4-4-4-4"
+                    />
+                  </svg>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
     </div>
   );
 }

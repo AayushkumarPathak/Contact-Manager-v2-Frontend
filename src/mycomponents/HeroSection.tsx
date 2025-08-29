@@ -21,7 +21,8 @@ const HeroSection: React.FC = () => {
 
           {/* Subtitle */}
           <p className="text-xl sm:text-2xl text-slate-600 dark:text-slate-400 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Effortlessly Manage & Scale Your Contacts Store millions of contacts on a fully managed cloud platform—secure, reliable, and built for seamless accessibility.
+            Effortlessly Manage & Scale Your Contacts Store millions of contacts on a fully managed cloud platform—secure, reliable, and built for seamless accessibility.<br/>
+            <span className='text-sm'>This is ERP Software, use Desktop for Great Exprience of UI.</span>
           </p>
 
           {/* CTA Buttons */}

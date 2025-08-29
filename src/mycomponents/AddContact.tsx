@@ -109,6 +109,11 @@ function AddContact() {
       toast.warning("Phone number is required and must be at least 10 digits");
       return false;
     }
+    // Only allow digits, no letters or special chars
+    if (!/^\d{10,}$/.test(formData.phoneNumber.trim())) {
+      toast.warning("Phone number must contain only digits");
+      return false;
+    }
 
     if (!formData.address || formData.address.trim().length < 3) {
       toast.warning("Address is required and must be at least 3 characters");
@@ -328,7 +333,7 @@ function AddContact() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Saving..." : "Save Contact"}
         </button>

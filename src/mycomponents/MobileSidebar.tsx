@@ -5,9 +5,10 @@ import { Link, useLocation } from 'react-router-dom';
 const sidebarItems = [
   { id: 'contacts', label: 'My Contacts', icon: User, path: '/user/contacts' },
   { id: 'add', label: 'Add Contact', icon: UserPlus, path: '/user/add' },
-  { id: 'favorites', label: 'Favorites', icon: Heart, path: '/user/favorites' },
+  
   { id: 'settings', label: 'Settings', icon: Settings, path: '/user/settings' },
 ];
+//{ id: 'favorites', label: 'Favorites', icon: Heart, path: '/user/favorites' },
 
 interface MobileSidebarProps {
   isOpen: boolean;

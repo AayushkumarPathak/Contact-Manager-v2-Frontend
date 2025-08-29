@@ -15,9 +15,10 @@ import { Link, useLocation } from 'react-router-dom';
 const sidebarItems = [
   { id: 'contacts', label: 'My Contacts', icon: Users, path: '/user/contacts' },
   { id: 'add', label: 'Add Contact', icon: UserPlus, path: '/user/add' },
-  { id: 'favorites', label: 'Favorites', icon: Heart, path: '/user/favorites' },
+  
   { id: 'settings', label: 'Settings', icon: Settings, path: '/user/settings' },
 ];
+// { id: 'favorites', label: 'Favorites', icon: Heart, path: '/user/favorites' },
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -35,7 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       {/* Sidebar Header */}
       <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
         {!isCollapsed && (
-          <span className="font-medium text-slate-900 dark:text-white"></span>
+          <span className="font-medium text-slate-900 dark:text-white">v2</span>
         )}
         <button
           onClick={onToggle}
@@ -82,7 +83,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       <div className="p-4 border-t border-slate-200 dark:border-slate-700">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-slate-300 dark:bg-slate-600 rounded-full flex items-center justify-center">
+            <Link to={"/user/profile"}>
             <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+            </Link>
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
