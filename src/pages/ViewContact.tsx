@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -15,7 +14,11 @@ import {
   Phone,
 } from "lucide-react";
 import type { Contact } from "@/types";
-import { deleteContactById,getContactById } from "@/apiService/contact-service";
+import {
+  deleteContactById,
+  getContactById,
+  updateContactById,
+} from "@/apiService/contact-service";
 import { toast } from "react-toastify";
 import BackButton from "@/mycomponents/BackButton";
 
@@ -31,34 +34,28 @@ const ViewContact = () => {
         try {
           const data = await getContactById(parseInt(contactId));
           setContact(data.data);
-          console.log(`Contact detail with id: ${contactId} : `,data.data);
+          console.log(`Contact detail with id: ${contactId} : `, data.data);
         } catch (error) {
-          console.log("NumberFormatException",error);
-          
+          console.log("NumberFormatException", error);
         }
       }
     };
     fetchContact();
   }, [contactId]);
 
-
-
   // Remove parameter from handleDelete, use contact?.id directly
   const handleDelete = async () => {
-   
-    try{
-        if(contactId){
-        const res = await deleteContactById(parseInt(contactId))
+    try {
+      if (contactId) {
+        const res = await deleteContactById(parseInt(contactId));
         console.log(res);
-        toast.success("Contact deleted successfully")
+        toast.success("Contact deleted successfully");
         navigate(-1);
-        }
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete contact, Try Again");
     }
-    catch (error) {
-        console.log(error)
-        toast.error("Failed to delete contact, Try Again");
-    }
-    
   };
 
   const handleEdit = () => {
@@ -69,15 +66,26 @@ const ViewContact = () => {
     setContact((prev) => (prev ? { ...prev, [field]: value } : null));
   };
 
-  const handleModalSubmit = (e: React.FormEvent) => {
+  const handleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Updated contact:", contact);
+
+    if (contact && contactId) {
+      try {
+        const res = await updateContactById(parseInt(contactId), contact);
+        console.log("Updated contact: ", res);
+        toast.success("Contact upated");
+      } catch (e) {
+      console.error(`Error upadating contact:`,e);
+      toast.error("failed to update")
+      }
+    }
+
     setShowEditModal(false);
   };
 
   return (
     <div className="p-4 sm:p-8 bg-slate-100 dark:bg-gray-900 min-h-screen text-slate-800 dark:text-slate-100">
-      <BackButton/>
+      <BackButton />
 
       {contact ? (
         <div className="bg-white dark:bg-gray-800 shadow-md rounded-2xl p-6 grid md:grid-cols-3 gap-6">
@@ -85,10 +93,13 @@ const ViewContact = () => {
             <img
               src={contact.picture}
               alt={contact.fullName}
+              loading="lazy"
               className="rounded-full h-40 w-40 object-cover shadow-md"
             />
             <h2 className="text-2xl font-bold mt-4">{contact.fullName}</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-300">{contact.description}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-300">
+              {contact.description}
+            </p>
             <div className="mt-4 flex gap-3">
               <button
                 onClick={handleEdit}
@@ -112,35 +123,42 @@ const ViewContact = () => {
             </div>
             <div className="flex items-center gap-2">
               <Phone size={18} className="text-slate-500 dark:text-slate-300" />
-              <span className="font-semibold mr-1">Phone:</span> {contact.phoneNumber}
+              <span className="font-semibold mr-1">Phone:</span>{" "}
+              {contact.phoneNumber}
             </div>
             <div className="flex items-center gap-2">
               <Globe size={18} className="text-slate-500 dark:text-slate-300" />
-              <span className="font-semibold mr-1">Website:</span> {contact.websiteLink || "N/A"}
+              <span className="font-semibold mr-1">Website:</span>{" "}
+              {contact.websiteLink || "N/A"}
             </div>
             <div className="flex items-center gap-2">
               <Link size={18} className="text-slate-500 dark:text-slate-300" />
-              <span className="font-semibold mr-1">LinkedIn:</span> {contact.linkedInLink || "N/A"}
+              <span className="font-semibold mr-1">LinkedIn:</span>{" "}
+              {contact.linkedInLink || "N/A"}
             </div>
             <div className="flex items-start gap-2">
               <Info size={18} className="text-slate-500 dark:text-slate-300" />
-              <span className="font-semibold mr-1">Address:</span> {contact.address}
+              <span className="font-semibold mr-1">Address:</span>{" "}
+              {contact.address}
             </div>
             {/* Links Array Section */}
             <div className="flex flex-col gap-2 mt-2">
               <span className="font-semibold flex items-center gap-2">
-                <Link size={18} className="text-slate-500 dark:text-slate-300" />
+                <Link
+                  size={18}
+                  className="text-slate-500 dark:text-slate-300"
+                />
                 Links:
               </span>
               {contact.links && contact.links.length > 0 ? (
                 <ul className="list-disc ml-7">
                   {contact.links.map((l) => (
                     <li key={l.id}>
-                      {(!l.link?.trim() || !l.title?.trim()) ? (
+                      {!l.link?.trim() || !l.title?.trim() ? (
                         <span className="text-slate-500">Not available</span>
                       ) : (
                         <>
-                          <span className="font-medium">{l.link}:</span>{' '}
+                          <span className="font-medium">{l.link}:</span>{" "}
                           <a
                             href={l.title}
                             target="_blank"

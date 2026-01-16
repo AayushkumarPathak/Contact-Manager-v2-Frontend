@@ -139,6 +139,7 @@ function MyContacts() {
                 <td className="p-4">
                   <div className="h-12 w-12 bg-gray-700 rounded-full">
                     <img 
+                    loading="lazy"
                       src={contact.picture}
                       alt={contact.fullName+"scm.jpg"}
                       className="h-full w-full rounded-full"

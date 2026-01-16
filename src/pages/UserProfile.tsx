@@ -122,7 +122,7 @@ const UserProfileCard = () => {
         toast.success("Profile updated successfully");
       }, 4000);
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to update profile");
+      toast.error(error?.response?.data?.message || "Failed to update profile try again");
     } finally {
       setLoading(false);
     }
@@ -144,15 +144,32 @@ const UserProfileCard = () => {
     );
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const formattedDate = date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-  };
 
-  // Loading state
+    // Calculate years difference
+    const now = new Date();
+    const yearsDiff = now.getFullYear() - date.getFullYear();
+    const monthsDiff = now.getMonth() - date.getMonth();
+    const daysDiff = now.getDate() - date.getDate();
+
+    // Adjust years if we haven't reached the anniversary month/day yet
+    const adjustedYears = monthsDiff < 0 || (monthsDiff === 0 && daysDiff < 0) 
+      ? yearsDiff - 1 
+      : yearsDiff;
+
+    // Create year text with proper plural
+    const yearText = adjustedYears === 1 ? "year" : "years";
+    const duration = adjustedYears > 0 ? `${adjustedYears} ${yearText} ago` : "Less than a year ago";
+    
+    return `${formattedDate} (${duration})`;
+  };  // Loading state
   if (userLoading) {
     return (
       <div className="min-h-screen bg-slate-50 p-4 flex items-center justify-center">
@@ -187,7 +204,7 @@ const UserProfileCard = () => {
       <div className="max-w-4xl mx-auto">
         {/* Profile Card */}
          <BackButton/>
-        <div className="bg-white rounded-xl border border--700 shadow-md shadow-gray-400 dark:shadow-md dark:shadow-gray-700 overflow-hidden ">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md dark:shadow-gray-700 overflow-hidden">
           {/* Header */}
           <div className="bg-slate-800 px-6 py-8 text-white">
             <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -225,42 +242,42 @@ const UserProfileCard = () => {
           </div>
 
           {/* Content */}
-          <div className="p-6 bg-gray-300">
+          <div className="p-6 bg-white dark:bg-gray-800">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Contact Information */}
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2">
+                <h2 className="text-lg font-semibold text-slate-800 dark:text-white border-b border-slate-200 dark:border-gray-700 pb-2">
                   Contact Information
                 </h2>
 
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <Mail size={18} className="text-slate-500 mt-0.5" />
+                    <Mail size={18} className="text-slate-500 dark:text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-slate-800 font-medium">
+                      <p className="text-slate-800 dark:text-white font-medium">
                         {userData.email}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-500 dark:text-gray-400">
                         Email address (not editable)
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Phone size={18} className="text-slate-500 mt-0.5" />
+                    <Phone size={18} className="text-slate-500 dark:text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-slate-800">{userData.phoneNumber}</p>
-                      <p className="text-xs text-slate-500">Phone number</p>
+                      <p className="text-slate-800 dark:text-white">{userData.phoneNumber}</p>
+                      <p className="text-xs text-slate-500 dark:text-gray-400">Phone number</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <MapPin size={18} className="text-slate-500 mt-0.5" />
+                    <MapPin size={18} className="text-slate-500 dark:text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-slate-800">
+                      <p className="text-slate-800 dark:text-white">
                         {makeTitleCase(userData.address)}
                       </p>
-                      <p className="text-xs text-slate-500">Address</p>
+                      <p className="text-xs text-slate-500 dark:text-gray-400">Address</p>
                     </div>
                   </div>
                 </div>
@@ -268,45 +285,45 @@ const UserProfileCard = () => {
 
               {/* Account Details */}
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2">
+                <h2 className="text-lg font-semibold text-slate-800 dark:text-white border-b border-slate-200 dark:border-gray-700 pb-2">
                   Account Details
                 </h2>
 
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <Calendar size={18} className="text-slate-500 mt-0.5" />
+                    <Calendar size={18} className="text-slate-500 dark:text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-slate-800">
+                      <p className="text-slate-800 dark:text-white">
                         {formatDate(userData.createdAt)}
                       </p>
-                      <p className="text-xs text-slate-500">Member since</p>
+                      <p className="text-xs text-slate-500 dark:text-gray-400">Member since</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Shield size={18} className="text-slate-500 mt-0.5" />
+                    <Shield size={18} className="text-slate-500 dark:text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-slate-800">{userData.provider}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-slate-800 dark:text-white">{userData.provider}</p>
+                      <p className="text-xs text-slate-500 dark:text-gray-400">
                         Authentication provider
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <User size={18} className="text-slate-500 mt-0.5" />
+                    <User size={18} className="text-slate-500 dark:text-gray-400 mt-0.5" />
                     <div>
                       <div className="flex flex-wrap gap-1">
                         {userData.roles.map((role, index) => (
                           <span
                             key={index}
-                            className="px-2 py-1 bg-slate-100 text-slate-700 text-xs rounded-full"
+                            className="px-2 py-1 bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-gray-200 text-xs rounded-full"
                           >
                             {role}
                           </span>
                         ))}
                       </div>
-                      <p className="text-xs text-slate-500 mt-1">User roles</p>
+                      <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">User roles</p>
                     </div>
                   </div>
                 </div>
@@ -314,14 +331,14 @@ const UserProfileCard = () => {
             </div>
 
             {/* About Section */}
-            <div className="mt-6 pt-6 border-t border-slate-200">
+            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-gray-700">
               <div className="flex items-start gap-3">
-                <FileText size={18} className="text-slate-500 mt-0.5" />
+                <FileText size={18} className="text-slate-500 dark:text-gray-400 mt-0.5" />
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
                     About
                   </h3>
-                  <p className="text-slate-600 leading-relaxed">
+                  <p className="text-slate-600 dark:text-gray-300 leading-relaxed">
                     {makeTitleCase(userData.about)}
                   </p>
                 </div>
@@ -334,26 +351,26 @@ const UserProfileCard = () => {
       {/* Edit Modal */}
       {isEditModalOpen && editFormData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-200">
-              <h2 className="text-xl font-semibold text-slate-800">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-white">
                 Edit Profile
               </h2>
               <button
                 onClick={handleCancelEdit}
-                className="text-slate-400 hover:text-slate-600 transition-colors"
+                className="text-slate-400 hover:text-slate-600 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
               >
                 <X size={24} />
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 dark:bg-gray-800">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Full Name */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-2">
                     Full Name
                   </label>
                   <input
@@ -362,13 +379,13 @@ const UserProfileCard = () => {
                     onChange={(e) =>
                       handleInputChange("fullName", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
                   />
                 </div>
 
                 {/* Username */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-2">
                     Username
                   </label>
                   <input
@@ -377,30 +394,30 @@ const UserProfileCard = () => {
                     onChange={(e) =>
                       handleInputChange("username", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
                   />
                 </div>
               </div>
 
               {/* Email (Read-only) */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-2">
                   Email Address
                 </label>
                 <input
                   type="email"
                   value={editFormData.email}
                   disabled
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent cursor-not-allowed"
                 />
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-orange-400 mt-1">
                   Email address cannot be changed
                 </p>
               </div>
 
               {/* Phone Number */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-2">
                   Phone Number
                 </label>
                 <input
@@ -409,33 +426,33 @@ const UserProfileCard = () => {
                   onChange={(e) =>
                     handleInputChange("phoneNumber", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
                 />
               </div>
 
               {/* Address */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-2">
                   Address
                 </label>
                 <input
                   type="text"
                   value={editFormData.address}
                   onChange={(e) => handleInputChange("address", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
                 />
               </div>
 
               {/* About */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-2">
                   About
                 </label>
                 <textarea
                   value={editFormData.about}
                   onChange={(e) => handleInputChange("about", e.target.value)}
                   rows={4}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent resize-none"
                 />
               </div>
 
@@ -449,7 +466,7 @@ const UserProfileCard = () => {
                   onChange={(e) =>
                     handleInputChange("enabled", e.target.checked)
                   }
-                  className="w-4 h-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
+                  className="w-4 h-4 text-slate-600 border-slate-300 dark:text-white rounded focus:ring-slate-500"
                 />
                 <label
                   htmlFor="enabled"
@@ -466,7 +483,7 @@ const UserProfileCard = () => {
                   type="button"
                   onClick={handleCancelEdit}
                   disabled={loading}
-                  className="px-4 py-2 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-slate-600 border border-slate-300 rounded-lg dark:text-white hover:bg-blue-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>
