@@ -106,17 +106,8 @@ const UserProfileCard = () => {
 
     setLoading(true);
     try {
-      // const updatedUser = await updateUser(user.id, {
-      //   fullName: editFormData.fullName,
-      //   phoneNumber: editFormData.phoneNumber,
-      //   username: editFormData.username,
-      //   address: editFormData.address,
-      //   about: editFormData.about,
-      // });
-
-      // setUserData(convertUserToUserData(updatedUser));
       setTimeout(() => {
-        console.log("Contact updated", updateUser);
+       
 
         setIsEditModalOpen(false);
         toast.success("Profile updated successfully");
@@ -339,7 +330,7 @@ const UserProfileCard = () => {
                     About
                   </h3>
                   <p className="text-slate-600 dark:text-gray-300 leading-relaxed">
-                    {makeTitleCase(userData.about)}
+                    {userData.about}
                   </p>
                 </div>
               </div>

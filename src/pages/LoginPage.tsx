@@ -50,7 +50,7 @@ const LoginPage: React.FC = () => {
     try {
       const jwtToken = await loginUser(formData);
       await doLogin(jwtToken, async () => {
-        console.log("User jwt token: ", jwtToken);
+        
         // Initialize user context with new data
         await initialize();
         toast.success("Login Success");
