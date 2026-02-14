@@ -3,7 +3,7 @@ import { getToken } from "@/auth";
 
 
 // export const BASE_URL:string ="http://localhost:8080/api/v2"
-export const BASE_URL:string ="https://scmv2apiserver-erhxb8cbc4bycgbw.centralindia-01.azurewebsites.net/api/v2"
+export const BASE_URL:string = import.meta.env.VITE_BACKEND_BASE_URL
 
 //for non-authenticated routes - login, signup
 export const myAxios = axios.create({

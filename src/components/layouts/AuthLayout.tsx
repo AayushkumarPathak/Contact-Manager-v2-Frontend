@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Navigate, Outlet} from 'react-router-dom';
 import Sidebar from '@/mycomponents/Sidebar';
 import TopNav from '@/mycomponents/TopNav';
 import { isLoggedIn } from '@/auth';
@@ -9,7 +9,6 @@ import MobileSidebar from '@/mycomponents/MobileSidebar';
 const AuthLayout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const location = useLocation();
 
   if (!isLoggedIn()) {
     return <Navigate to="/login" replace />;

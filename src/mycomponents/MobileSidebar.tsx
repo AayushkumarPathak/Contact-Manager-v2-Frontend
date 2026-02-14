@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, User, UserPlus, Heart, Settings } from 'lucide-react';
+import { X, User, UserPlus, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const sidebarItems = [

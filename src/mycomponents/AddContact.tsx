@@ -4,7 +4,6 @@ import { Plus, X } from "lucide-react";
 import { saveContactForUser } from "@/apiService/contact-service";
 import { toast } from "react-toastify";
 import { useUserContext } from "@/contexts/user-context";
-import UploadProgressBar from "./UploadProgressBar";
 
 function AddContact() {
   const [loading, setLoading] = useState(false);

@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   Pencil,
   Trash2,
-  ArrowLeft,
   Loader2,
   X,
   Save,
@@ -58,7 +57,7 @@ const ViewContact = () => {
 
     try {
       if (contactId) {
-        const res = await deleteContactById(parseInt(contactId));
+        await deleteContactById(parseInt(contactId));
         toast.success("Contact deleted successfully");
         setShowDeleteModal(false);
         navigate(-1);
@@ -82,7 +81,7 @@ const ViewContact = () => {
 
     if (contact && contactId) {
       try {
-        const res = await updateContactById(parseInt(contactId), contact);
+        await updateContactById(parseInt(contactId), contact);
         toast.success("Contact upated");
       } catch (e) {
       console.error(`Error upadating contact:`,e);

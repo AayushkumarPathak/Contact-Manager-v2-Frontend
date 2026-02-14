@@ -2,7 +2,7 @@ import { getContactByUser } from "@/apiService/contact-service";
 import { useUserContext } from "@/contexts/user-context";
 import type { Contact } from "@/types";
 import { useEffect, useState } from "react";
-import { Eye, Loader2, Pen, TrashIcon, UserRoundSearch } from "lucide-react";
+import { Loader2, UserRoundSearch } from "lucide-react";
 import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from "@/util/app-constants";
 import { Link } from "react-router-dom";
 
@@ -39,6 +39,7 @@ function MyContacts() {
             totalPages: fetchedContacts.totalPages,
             lastPage: fetchedContacts.lastPage,
           });
+          console.log("Contacts fetched successfully")
         }
       } catch (error) {
         console.error("Failed to fetch contacts:", error);

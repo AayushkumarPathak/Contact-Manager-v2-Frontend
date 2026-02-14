@@ -1,11 +1,11 @@
 import { privateAxios } from "./Api-Constants";
-import type { Contact, ContactFormData,PaginatedContactResponse } 
+import type { ContactFormData,PaginatedContactResponse } 
 from "@/types/index";
 
 export const getContactByUser = async (
   uid: number,
-  pageNumber : number,
-  pageSize : number
+  pageNumber: number,
+  pageSize: number
 ): Promise<PaginatedContactResponse | null> => {
   try {
     const response = await privateAxios.get(`/contact/user/${uid}?pageNumber=${pageNumber}&pageSize=${pageSize}&sortBy=fullName&sortDir=${"asc"}`);

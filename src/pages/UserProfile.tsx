@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   User,
   Mail,
@@ -11,14 +11,13 @@ import {
   X,
   Save,
   Loader2,
-  ArrowLeft,
 } from "lucide-react";
 import { useUserContext } from "@/contexts/user-context";
 import type { User as UserType } from "@/types/index";
 import { toast } from "react-toastify";
-import { updateUser } from "@/apiService/user-service";
+// import { updateUser } from "@/apiService/user-service";
 import { makeTitleCase } from "@/util/helpers";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import BackButton from "@/mycomponents/BackButton";
 
 interface UserData {
@@ -40,7 +39,7 @@ const UserProfileCard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // Convert User type to UserData format
   const convertUserToUserData = (user: UserType): UserData => {

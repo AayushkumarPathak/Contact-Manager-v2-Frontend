@@ -43,7 +43,7 @@ const Signup: React.FC = () => {
       }
       // backend api call here.
       signupUser(formData)
-      .then((res)=>{
+      .then(()=>{
        
         console.log("Sign up Success");
         toast.success("Sign up Success");
