@@ -2,12 +2,13 @@ import { getContactByUser } from "@/apiService/contact-service";
 import { useUserContext } from "@/contexts/user-context";
 import type { Contact } from "@/types";
 import { useEffect, useState } from "react";
-import { Eye, Loader2, Pen, TrashIcon, UserRoundSearch } from "lucide-react";
+import { Loader2, UserRoundSearch } from "lucide-react";
 import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from "@/util/app-constants";
 import { Link } from "react-router-dom";
 
 function MyContacts() {
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [allContacts, setAllContacts] = useState<Contact[]>([]);
   const { user, loading: userLoading } = useUserContext();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -17,6 +18,9 @@ function MyContacts() {
   totalPages: 0,
   lastPage: true,
 });
+  const [searchKey, setSearchKey] = useState<"fullName" | "email" | "favorite" | "phoneNumber">("fullName");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -27,6 +31,7 @@ function MyContacts() {
         const fetchedContacts = await getContactByUser(user.id,0,5);
         if(fetchedContacts){
           setContacts(fetchedContacts.contacts);
+          setAllContacts(fetchedContacts.contacts);
           setPagination({
             pageNumber: fetchedContacts.pageNumber,
             pageSize: fetchedContacts.pageSize,
@@ -34,8 +39,8 @@ function MyContacts() {
             totalPages: fetchedContacts.totalPages,
             lastPage: fetchedContacts.lastPage,
           });
+          console.log("Contacts fetched successfully")
         }
-        console.log("Fetched contacts:", fetchedContacts);
       } catch (error) {
         console.error("Failed to fetch contacts:", error);
       } finally {
@@ -51,6 +56,7 @@ function MyContacts() {
       const response = await getContactByUser(user.id,pageNumber,pageSize);
       if(response){
           setContacts(response.contacts);
+          setAllContacts(response.contacts);
           setPagination({
             pageNumber: response.pageNumber,
             pageSize: response.pageSize,
@@ -63,6 +69,27 @@ function MyContacts() {
 
   }
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    
+    if (!query.trim()) {
+      setContacts(allContacts);
+      return;
+    }
+
+    const filtered = allContacts.filter((contact) => {
+      if (searchKey === "favorite") {
+        const isFavorite = query.toLowerCase() === "favorite" || query.toLowerCase() === "fav";
+        return contact.favorite === isFavorite;
+      }
+      
+      const value = contact[searchKey]?.toString().toLowerCase() || "";
+      return value.includes(query.toLowerCase());
+    });
+
+    setContacts(filtered);
+  };
+
   if (userLoading || loading) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
@@ -74,28 +101,93 @@ function MyContacts() {
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
       <div className="flex items-center justify-between flex-wrap gap-4 p-4 bg-white dark:bg-gray-900">
-        <button className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
-          Action
-          <svg
-            className="w-2.5 h-2.5 ms-2.5"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 10 6"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="m1 1 4 4 4-4"
-            />
-          </svg>
-        </button>
+        <div className="relative">
+          <button 
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
+            {searchKey === "fullName" ? "Name" : searchKey === "phoneNumber" ? "Phone" : searchKey.charAt(0).toUpperCase() + searchKey.slice(1)}
+            <svg
+              className="w-2.5 h-2.5 ms-2.5"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 4 4 4-4"
+              />
+            </svg>
+          </button>
+          
+          {showDropdown && (
+            <div className="absolute z-10 mt-2 w-44 bg-white rounded-lg shadow dark:bg-gray-700">
+              <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+                <li>
+                  <button
+                    onClick={() => {
+                      setSearchKey("fullName");
+                      setShowDropdown(false);
+                      setSearchQuery("");
+                      setContacts(allContacts);
+                    }}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    Name
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      setSearchKey("email");
+                      setShowDropdown(false);
+                      setSearchQuery("");
+                      setContacts(allContacts);
+                    }}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    Email
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      setSearchKey("phoneNumber");
+                      setShowDropdown(false);
+                      setSearchQuery("");
+                      setContacts(allContacts);
+                    }}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    Phone
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      setSearchKey("favorite");
+                      setShowDropdown(false);
+                      setSearchQuery("");
+                      setContacts(allContacts);
+                    }}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    Favorite
+                  </button>
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
 
         <div className="relative">
           <input
             type="text"
-            placeholder="Search for users"
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder={`Search by ${searchKey === "fullName" ? "name" : searchKey === "phoneNumber" ? "phone" : searchKey}`}
             className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
           />
           <div className="absolute inset-y-0 left-0 flex items-center ps-3 pointer-events-none">
@@ -139,6 +231,7 @@ function MyContacts() {
                 <td className="p-4">
                   <div className="h-12 w-12 bg-gray-700 rounded-full">
                     <img 
+                    loading="eager"
                       src={contact.picture}
                       alt={contact.fullName+"scm.jpg"}
                       className="h-full w-full rounded-full"

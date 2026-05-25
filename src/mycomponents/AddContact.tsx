@@ -7,6 +7,7 @@ import { useUserContext } from "@/contexts/user-context";
 
 function AddContact() {
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [formData, setFormData] = useState<ContactFormData>({
     fullName: "",
@@ -69,19 +70,40 @@ function AddContact() {
     if (!isValid) return;
 
     setLoading(true);
+    setUploadProgress(0);
+    
+    // Simulate progress increments
+    const progressInterval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 95) {
+          clearInterval(progressInterval);
+          return 95;
+        }
+        return prev + 5;
+      });
+    }, 200);
+
     try {
       if (user) {
         await saveContactForUser(user?.id, formData, imageFile);
-        toast.success("Contact Saved Successfully");
-        clearForm();
+        setUploadProgress(100);
+        clearInterval(progressInterval);
+        
+        setTimeout(() => {
+          toast.success("Contact Saved Successfully");
+          clearForm();
+          setUploadProgress(0);
+        }, 500);
       }
     } catch (error: any) {
+      clearInterval(progressInterval);
+      setUploadProgress(0);
       toast.error(
         error?.response?.data?.message ||
           "Failed to save contact. Please try again."
       );
     } finally {
-      setLoading(false);
+      setTimeout(() => setLoading(false), 600);
     }
   };
 
@@ -328,6 +350,24 @@ function AddContact() {
             </div>
           )}
         </div>
+
+        {/* Progress Bar */}
+        {imageFile && loading && uploadProgress > 0 && (
+          <div className="w-full space-y-2">
+            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
+              <span>
+                {uploadProgress < 100 ? "Uploading Image..." : "Upload complete!"}
+              </span>
+              <span>{uploadProgress}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
+              <div
+                className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Submit */}
         <button

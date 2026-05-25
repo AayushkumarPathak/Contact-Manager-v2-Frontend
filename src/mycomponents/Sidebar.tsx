@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
 import { 
   ChevronLeft, 
   ChevronRight, 
   User, 
   Users, 
   UserPlus, 
-  Heart, 
   Settings 
 } from 'lucide-react';
 import { useUserContext } from '@/contexts/user-context';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, User, UserPlus, Heart, Settings } from 'lucide-react';
+import { X, User, UserPlus, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const sidebarItems = [
@@ -32,7 +32,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
       <div className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700">
         {/* Header */}
         <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-          <span className="font-medium text-slate-900 dark:text-white">Menu</span>
+          <span className="font-medium text-slate-900 dark:text-white">v2</span>
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"

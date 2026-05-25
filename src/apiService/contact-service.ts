@@ -1,14 +1,14 @@
 import { privateAxios } from "./Api-Constants";
-import type { Contact, ContactFormData,PaginatedContactResponse } 
+import type { ContactFormData,PaginatedContactResponse } 
 from "@/types/index";
 
 export const getContactByUser = async (
   uid: number,
-  pageNumber : number,
-  pageSize : number
+  pageNumber: number,
+  pageSize: number
 ): Promise<PaginatedContactResponse | null> => {
   try {
-    const response = await privateAxios.get(`/contact/user/${uid}?pageNumber=${pageNumber}&pageSize=${pageSize}&sortBy=createdAt&sortDir=${"desc"}`);
+    const response = await privateAxios.get(`/contact/user/${uid}?pageNumber=${pageNumber}&pageSize=${pageSize}&sortBy=fullName&sortDir=${"asc"}`);
 
     return response.data.data as PaginatedContactResponse;
   } catch (error) {
@@ -46,5 +46,10 @@ export const deleteContactById = async (contactId:number) => {
 export const getContactById = async (contactId: number) => {
     const response = await privateAxios.get(`/contact/${contactId}`);
     return response.data;
-  };
+};
+
+export const updateContactById = async (contactId:number, contactDto:ContactFormData) => {
+  const response = await privateAxios.put(`/contact/${contactId}`,contactDto);
+  return response.data;
+}
 

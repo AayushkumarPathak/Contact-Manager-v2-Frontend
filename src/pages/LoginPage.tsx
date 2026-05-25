@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import Navbar from '../mycomponents/PublicNavbar';
@@ -50,7 +50,7 @@ const LoginPage: React.FC = () => {
     try {
       const jwtToken = await loginUser(formData);
       await doLogin(jwtToken, async () => {
-        console.log("User jwt token: ", jwtToken);
+        
         // Initialize user context with new data
         await initialize();
         toast.success("Login Success");

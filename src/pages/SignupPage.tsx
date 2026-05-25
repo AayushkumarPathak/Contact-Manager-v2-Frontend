@@ -28,7 +28,7 @@ const Signup: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle registration logic here
-    console.log('Registration data:', formData);
+  
 
      if (
         formData.email.trim() === "" ||
@@ -43,8 +43,8 @@ const Signup: React.FC = () => {
       }
       // backend api call here.
       signupUser(formData)
-      .then((res)=>{
-        console.log("Response:", res);
+      .then(()=>{
+       
         console.log("Sign up Success");
         toast.success("Sign up Success");
         navigate("/login");

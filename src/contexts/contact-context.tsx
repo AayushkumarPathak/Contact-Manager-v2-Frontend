@@ -3,7 +3,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { getContactByUser } from "@/apiService/contact-service";
 import { useUserContext } from "./user-context";
 import type { Contact } from "@/types";
-import { useNavigate } from "react-router-dom";
 
 interface ContactContextType {
   contacts: Contact[];
@@ -22,8 +21,8 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const fetchContacts = async () => {
       if (user) {
         try {
-          const res = await getContactByUser(user.id);
-          setContacts(res);
+          const res = await getContactByUser(user.id,0,5);
+          setContacts(res?.contacts ?? []);
         } catch (err) {
           console.error("Error fetching contacts:", err);
         } finally {
